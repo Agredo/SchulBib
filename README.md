@@ -44,8 +44,8 @@ SchulBib ist eine **Open Source Bibliotheksverwaltung**, die speziell für deuts
 ## 🛠️ Technologie-Stack
 
 ```
-Frontend:     .NET MAUI 8.0 (iOS, Android, Windows)
-Backend:      ASP.NET Core 8.0 Web API
+Frontend:     .NET MAUI 9.0+ (iOS, Android, Windows)
+Backend:      ASP.NET Core 9.0+ Web API
 Datenbank:    SQLite mit AES-256 Verschlüsselung
 QR-Codes:     ZXing.Net.Maui
 ISBN-Lookup:  Open Library API (kostenlos)
