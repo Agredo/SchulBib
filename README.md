@@ -24,7 +24,7 @@ SchulBib ist eine **Open Source Bibliotheksverwaltung**, die speziell für deuts
 ### 👨‍🎓 Für Schüler
 - **QR-Code-Login** - Einfacher Zugang per Scan oder ID
 - **Intuitive Buchausleihe** - Kamera-basierter Scanner
-- **Meine Bücher** - Übersicht mit Cover-Bildern und Rückgabedaten
+- **Meine Bücher** - Übersicht (ggf. mit Cover-Bildern) und Rückgabedaten
 - **Smart Reminders** - Automatische Erinnerungen vor Rückgabetermin
 - **Offline-Modus** - Auch bei WLAN-Problemen nutzbar
 
