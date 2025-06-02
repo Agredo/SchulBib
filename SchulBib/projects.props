@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+	<PropertyGroup>
+		<ProjectTargetFramework>net9.0</ProjectTargetFramework>
+		<MauiNugetVersion>9.0.70</MauiNugetVersion>
+	</PropertyGroup>
+</Project>
