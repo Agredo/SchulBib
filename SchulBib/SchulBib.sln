@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36121.58 d17.14
+VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -47,6 +47,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFiles", "ProjectFile
 		projects.props = projects.props
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C22EDCE7-FEA8-4B0E-B920-C1D0B4E56CDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,7 @@ Global
 		{3B164DCE-0616-C59E-4F3E-C9AEC15AD595}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7217C22-51EF-49E5-9FB1-AAD2769BE98C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7217C22-51EF-49E5-9FB1-AAD2769BE98C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7217C22-51EF-49E5-9FB1-AAD2769BE98C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{C7217C22-51EF-49E5-9FB1-AAD2769BE98C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7217C22-51EF-49E5-9FB1-AAD2769BE98C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{741EA468-FD84-4E9F-BA26-72DF3A048BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
