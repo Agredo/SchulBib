@@ -33,6 +33,11 @@ public class Book : BaseEntity
 
     public BookStatus Status { get; set; } = BookStatus.Available;
 
+    public BookCondition Condition { get; set; } = BookCondition.Good; // Zustand des Buches
+
+    [MaxLength(50)]
+    public string? Location { get; set; } // Regal/Standort in der Bibliothek
+
     // ISBN-Lookup Metadaten als JSON
     [MaxLength(4000)]
     public string? ExternalMetadata { get; set; } // JSON für Open Library Data

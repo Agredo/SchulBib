@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\projects.props" />
+	<Import Project="..\..\projects.props" />
 
 	<PropertyGroup>
 	<TargetFramework>$(ProjectTargetFramework)</TargetFramework>

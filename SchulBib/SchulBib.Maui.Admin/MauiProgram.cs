@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SchulBib.Data;
+using IPreferences = AgredoApplication.MVVM.Services.Abstractions.Storage.IPreferences;
+using Preferences = AgredoApplication.MVVM.Services.Maui.Storage.Preferences;
 
 namespace SchulBib.Maui.Admin
 {
@@ -9,17 +14,37 @@ namespace SchulBib.Maui.Admin
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+            
+            ConfigureServices(builder.Services);
+
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            // Register the SchulBibDbContext with SQLite database configuration
+            string databasePath = Path.Combine(FileSystem.AppDataDirectory, "SchulBib.sqlite");
+            services.AddDbContext<SchulBibDbContext>(options =>
+            {
+                options.UseSqlite($"Data Source={databasePath}");
+
+                //options.UseNpgsql("Host=localhost;Database=schulbib;Username=postgres;Password=yourpassword");
+            });
+
+            // Register other services as needed
+            
+            services.AddSingleton<IPreferences, Preferences>();
         }
     }
 }
