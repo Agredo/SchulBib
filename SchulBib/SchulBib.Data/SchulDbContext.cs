@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AgredoApplication.MVVM.Services.Abstractions.IO;
+using AgredoApplication.MVVM.Services.Abstractions.Storage;
+using Microsoft.EntityFrameworkCore;
 using SchulBib.Models.Entities;
 
 namespace SchulBib.Data;
@@ -10,6 +12,8 @@ namespace SchulBib.Data;
 /// </summary>
 public class SchulBibDbContext : DbContext
 {
+    private readonly string DATABASE_PATH_PREFERENCES_KEY = "databasePath";
+
     /// <summary>
     /// Gets or sets the database file path for SQLite.
     /// This property is used when creating database migrations or when using a local SQLite database.
@@ -57,6 +61,9 @@ public class SchulBibDbContext : DbContext
     /// Provides access to book reservation records in the database.
     /// </summary>
     public DbSet<BookReservation> BookReservations { get; set; }
+    public DbContextOptions<SchulBibDbContext> Options { get; }
+    public IFileSystem FileSystem { get; }
+    public IPreferences Preferences { get; }
 
     /// <summary>
     /// Initializes a new instance of the SchulBibDbContext class.
@@ -71,8 +78,13 @@ public class SchulBibDbContext : DbContext
     /// This constructor is typically used when the context is configured by dependency injection.
     /// </summary>
     /// <param name="options">The options to be used by the DbContext.</param>
-    public SchulBibDbContext(DbContextOptions<SchulBibDbContext> options) : base(options)
+    public SchulBibDbContext(DbContextOptions<SchulBibDbContext> options, IFileSystem fileSystem, IPreferences preferences) : base(options)
     {
+        FileSystem = fileSystem;
+        Preferences = preferences;
+
+        DatabasePath = preferences.Get(DATABASE_PATH_PREFERENCES_KEY, Path.Combine(fileSystem.AppDataDirectory, "SchulBib.sqlite"), DATABASE_PATH_PREFERENCES_KEY);
+
     }
 
     /// <summary>
@@ -87,7 +99,7 @@ public class SchulBibDbContext : DbContext
         ////Needed to create Migrations and update the database
         ////Comment this line out after creating a migration. The connection string will be set in the MauiProgram.cs
         ////A schulbib.db file will be created within the project SchulBib.Data. Make sure to delete it.
-        //optionsBuilder.UseSqlite($"Data Source={DatabasePath}");
+        optionsBuilder.UseSqlite($"Data Source={DatabasePath}");
 
         // Development configuration
 #if DEBUG

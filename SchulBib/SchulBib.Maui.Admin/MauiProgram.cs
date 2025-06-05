@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Maui;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchulBib.Data;
 using SchulBib.Data.Repository;
@@ -38,13 +37,7 @@ namespace SchulBib.Maui.Admin
         private static void ConfigureServices(IServiceCollection services)
         {
             // Register the SchulBibDbContext with SQLite database configuration
-            string databasePath = Path.Combine(Microsoft.Maui.Storage.FileSystem.AppDataDirectory, "SchulBib.sqlite");
-            services.AddDbContext<SchulBibDbContext>(options =>
-            {
-                options.UseSqlite($"Data Source={databasePath}");
-
-                //options.UseNpgsql("Host=localhost;Database=schulbib;Username=postgres;Password=yourpassword");
-            });
+            services.AddDbContext<SchulBibDbContext>();
             services.AddSingleton(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Register other services as needed
