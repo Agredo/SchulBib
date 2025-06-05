@@ -122,6 +122,9 @@ public class SchulBibDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Apply all configurations defined in the SchulBibDbContextConfiguration class
+        SchulBibDbContextConfiguration.ApplyAllConfigurations(modelBuilder);
     }
 
     /// <summary>
