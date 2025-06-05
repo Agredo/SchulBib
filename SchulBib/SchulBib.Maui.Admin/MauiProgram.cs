@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchulBib.Data;
+using SchulBib.Data.Repository;
+using SchulBib.Data.Repository.Abstractions;
+using FileSystem = AgredoApplication.MVVM.Services.Maui.IO.FileSystem;
+using IFileSystem = AgredoApplication.MVVM.Services.Abstractions.IO.IFileSystem;
 using IPreferences = AgredoApplication.MVVM.Services.Abstractions.Storage.IPreferences;
 using Preferences = AgredoApplication.MVVM.Services.Maui.Storage.Preferences;
-using IFileSystem = AgredoApplication.MVVM.Services.Abstractions.IO.IFileSystem;
-using FileSystem = AgredoApplication.MVVM.Services.Maui.IO.FileSystem;
 
 namespace SchulBib.Maui.Admin
 {
@@ -43,9 +45,10 @@ namespace SchulBib.Maui.Admin
 
                 //options.UseNpgsql("Host=localhost;Database=schulbib;Username=postgres;Password=yourpassword");
             });
+            services.AddSingleton(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Register other services as needed
-            
+
             services.AddSingleton<IPreferences, Preferences>();
             services.AddSingleton<IFileSystem, FileSystem>();
         }

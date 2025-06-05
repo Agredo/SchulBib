@@ -12,8 +12,8 @@
 	  <PackageReference Include="AgredoApplication.MVVM.Services" Version="1.0.0" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SchulBib.Data\SchulBib.Data.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SchulBib.Models\SchulBib.Models.csproj" />
+	</ItemGroup>
 
 </Project>

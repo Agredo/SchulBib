@@ -4,7 +4,7 @@ using SchulBib.Models.Entities.Enums;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace SchulBib.Data;
+namespace SchulBib.Data.Extensions;
 
 /// <summary>
 /// Provides extension methods for querying the SchulBib database entities.
@@ -246,9 +246,9 @@ public static class SchulBibQueryExtensions
 
         return books.Where(b =>
             b.Title.ToLower().Contains(searchTerm) ||
-            (b.Author != null && b.Author.ToLower().Contains(searchTerm)) ||
-            (b.ISBN != null && b.ISBN.Contains(searchTerm)) ||
-            (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+            b.Author != null && b.Author.ToLower().Contains(searchTerm) ||
+            b.ISBN != null && b.ISBN.Contains(searchTerm) ||
+            b.Description != null && b.Description.ToLower().Contains(searchTerm));
     }
 
     /// <summary>

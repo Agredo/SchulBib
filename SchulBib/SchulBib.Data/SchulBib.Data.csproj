@@ -18,7 +18,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SchulBib.Models\SchulBib.Models.csproj" />
+    <ProjectReference Include="..\SchulBib.Services\SchulBib.Services.csproj" />
   </ItemGroup>
 
 </Project>
