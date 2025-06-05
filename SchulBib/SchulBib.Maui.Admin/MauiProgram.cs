@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using SchulBib.Data;
 using IPreferences = AgredoApplication.MVVM.Services.Abstractions.Storage.IPreferences;
 using Preferences = AgredoApplication.MVVM.Services.Maui.Storage.Preferences;
+using IFileSystem = AgredoApplication.MVVM.Services.Abstractions.IO.IFileSystem;
+using FileSystem = AgredoApplication.MVVM.Services.Maui.IO.FileSystem;
 
 namespace SchulBib.Maui.Admin
 {
@@ -34,7 +36,7 @@ namespace SchulBib.Maui.Admin
         private static void ConfigureServices(IServiceCollection services)
         {
             // Register the SchulBibDbContext with SQLite database configuration
-            string databasePath = Path.Combine(FileSystem.AppDataDirectory, "SchulBib.sqlite");
+            string databasePath = Path.Combine(Microsoft.Maui.Storage.FileSystem.AppDataDirectory, "SchulBib.sqlite");
             services.AddDbContext<SchulBibDbContext>(options =>
             {
                 options.UseSqlite($"Data Source={databasePath}");
@@ -45,6 +47,7 @@ namespace SchulBib.Maui.Admin
             // Register other services as needed
             
             services.AddSingleton<IPreferences, Preferences>();
+            services.AddSingleton<IFileSystem, FileSystem>();
         }
     }
 }

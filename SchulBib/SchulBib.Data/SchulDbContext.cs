@@ -5,7 +5,7 @@ namespace SchulBib.Data;
 
 public class SchulBibDbContext : DbContext
 {
-    public string DataBasePath { get; private set; }
+    public string DatabasePath { get; private set; } = "schulbib.db";
     public DbSet<Student> Students { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Book> Books { get; set; }
@@ -14,6 +14,10 @@ public class SchulBibDbContext : DbContext
     public DbSet<AppSetting> AppSettings { get; set; }
     public DbSet<BookReservation> BookReservations { get; set; }
 
+    public SchulBibDbContext()
+    {
+    }
+
     public SchulBibDbContext(DbContextOptions<SchulBibDbContext> options) : base(options)
     {
     }
@@ -21,7 +25,11 @@ public class SchulBibDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
-        DataBasePath = Database.GetConnectionString();
+        
+        ////Needed to create Migrations and update the database
+        ////Comment this line out after creating a migration. The connection string will be set in the MauiProgram.cs
+        ////A schulbib.db file will be created within the project SchulBib.Data. Make sure to delete it.
+        //optionsBuilder.UseSqlite($"Data Source={DatabasePath}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,8 +37,12 @@ public class SchulBibDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    /// <summary>
+    /// Migrates the database to the latest version and ensures it is created.
+    /// </summary>
     public void EnsureDatabaseCreated()
     {
+        var path = Database.GetConnectionString();
         Database.Migrate();
     }
 }

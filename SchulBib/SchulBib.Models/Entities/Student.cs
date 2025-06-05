@@ -17,6 +17,7 @@ public class Student : BaseEntity
 
     // Navigation Properties
     public virtual ICollection<Loan> Loans { get; set; } = new List<Loan>();
+    public virtual ICollection<BookReservation> Reservations { get; set; } = new List<BookReservation>();
 
     // Computed Property für Display
     public string DisplayName => $"{FirstName} ({ClassCode})";

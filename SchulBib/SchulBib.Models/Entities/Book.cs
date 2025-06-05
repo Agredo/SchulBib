@@ -46,6 +46,7 @@ public class Book : BaseEntity
 
     // Navigation Properties
     public virtual ICollection<Loan> Loans { get; set; } = new List<Loan>();
+    public virtual ICollection<BookReservation> Reservations { get; set; } = new List<BookReservation>();
 
     // Computed Properties
     public bool IsAvailable => Status == BookStatus.Available;
