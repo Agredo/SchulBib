@@ -230,25 +230,146 @@ public static class SchulBibQueryExtensions
     }
 
     /// <summary>
-    /// Performs an optimized search for books based on a search term.
+    /// Retrieves book titles with at least one available copy.
     /// </summary>
-    /// <param name="books">The IQueryable of Book entities to search</param>
-    /// <param name="searchTerm">The search term to look for in book title, author, ISBN, or description</param>
-    /// <returns>An IQueryable of Book entities matching the search term</returns>
-    public static IQueryable<Book> SearchBooks(
-        this IQueryable<Book> books,
+    /// <param name="bookTitles">The IQueryable of BookTitle entities to filter</param>
+    /// <returns>An IQueryable of BookTitle entities that have at least one available book</returns>
+    public static IQueryable<BookTitle> WithAvailableCopies(this IQueryable<BookTitle> bookTitles)
+    {
+        return bookTitles.Where(bt => bt.Books.Any(b => b.Status == BookStatus.Available && !b.IsDeleted));
+    }
+
+    /// <summary>
+    /// Filters book titles by language.
+    /// </summary>
+    /// <param name="bookTitles">The IQueryable of BookTitle entities to filter</param>
+    /// <param name="language">The language code (e.g., "de", "en")</param>
+    /// <returns>An IQueryable of BookTitle entities in the specified language</returns>
+    public static IQueryable<BookTitle> InLanguage(this IQueryable<BookTitle> bookTitles, string language)
+    {
+        return bookTitles.Where(bt => bt.Language == language);
+    }
+
+    /// <summary>
+    /// Filters book titles by genre.
+    /// </summary>
+    /// <param name="bookTitles">The IQueryable of BookTitle entities to filter</param>
+    /// <param name="genre">The genre to filter by</param>
+    /// <returns>An IQueryable of BookTitle entities of the specified genre</returns>
+    public static IQueryable<BookTitle> ByGenre(this IQueryable<BookTitle> bookTitles, string genre)
+    {
+        return bookTitles.Where(bt => bt.Genre == genre);
+    }
+
+    /// <summary>
+    /// Filters book titles by subject/discipline.
+    /// </summary>
+    /// <param name="bookTitles">The IQueryable of BookTitle entities to filter</param>
+    /// <param name="subject">The subject to filter by</param>
+    /// <returns>An IQueryable of BookTitle entities of the specified subject</returns>
+    public static IQueryable<BookTitle> BySubject(this IQueryable<BookTitle> bookTitles, string subject)
+    {
+        return bookTitles.Where(bt => bt.Subject == subject);
+    }
+
+    /// <summary>
+    /// Performs an optimized search for book titles based on a search term.
+    /// </summary>
+    /// <param name="bookTitles">The IQueryable of BookTitle entities to search</param>
+    /// <param name="searchTerm">The search term to look for in title, author, ISBN, or description</param>
+    /// <returns>An IQueryable of BookTitle entities matching the search term</returns>
+    public static IQueryable<BookTitle> SearchBookTitles(
+        this IQueryable<BookTitle> bookTitles,
         string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return books;
+            return bookTitles;
 
         searchTerm = searchTerm.ToLower();
 
-        return books.Where(b =>
-            b.Title.ToLower().Contains(searchTerm) ||
-            b.Author != null && b.Author.ToLower().Contains(searchTerm) ||
-            b.ISBN != null && b.ISBN.Contains(searchTerm) ||
-            b.Description != null && b.Description.ToLower().Contains(searchTerm));
+        return bookTitles.Where(bt =>
+            bt.Title.ToLower().Contains(searchTerm) ||
+            bt.Author != null && bt.Author.ToLower().Contains(searchTerm) ||
+            bt.ISBN != null && bt.ISBN.Contains(searchTerm) ||
+            bt.Description != null && bt.Description.ToLower().Contains(searchTerm) ||
+            bt.Publisher != null && bt.Publisher.ToLower().Contains(searchTerm));
+    }
+
+    /// <summary>
+    /// Gets all book titles with their book copies eagerly loaded.
+    /// </summary>
+    /// <param name="bookTitles">The IQueryable of BookTitle entities</param>
+    /// <returns>An IQueryable of BookTitle entities with Books included</returns>
+    public static IQueryable<BookTitle> IncludeBooks(this IQueryable<BookTitle> bookTitles)
+    {
+        return bookTitles.Include(bt => bt.Books);
+    }
+
+    /// <summary>
+    /// Gets statistics for a book title.
+    /// </summary>
+    /// <param name="context">The database context</param>
+    /// <param name="bookTitleId">The unique identifier of the book title</param>
+    /// <returns>A tuple containing total copies, available copies, borrowed copies, and reserved copies</returns>
+    public static async Task<(int Total, int Available, int Borrowed, int Reserved)> GetBookTitleStatistics(
+        this SchulBibDbContext context,
+        Guid bookTitleId)
+    {
+        var books = await context.Books
+            .Where(b => b.BookTitleId == bookTitleId && !b.IsDeleted)
+            .Select(b => b.Status)
+            .ToListAsync();
+
+        return (
+            Total: books.Count,
+            Available: books.Count(s => s == BookStatus.Available),
+            Borrowed: books.Count(s => s == BookStatus.Borrowed),
+            Reserved: books.Count(s => s == BookStatus.Reserved)
+        );
+    }
+
+    /// <summary>
+    /// Finds the best available copy of a book title (based on condition).
+    /// </summary>
+    /// <param name="context">The database context</param>
+    /// <param name="bookTitleId">The unique identifier of the book title</param>
+    /// <returns>The best available book copy, or null if none available</returns>
+    public static async Task<Book?> FindBestAvailableCopy(
+        this SchulBibDbContext context,
+        Guid bookTitleId)
+    {
+        return await context.Books
+            .Where(b => b.BookTitleId == bookTitleId &&
+                       b.Status == BookStatus.Available &&
+                       !b.IsDeleted)
+            .OrderBy(b => b.Condition) // Excellent = 0, Good = 1, etc.
+            .FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Gets popular book titles based on loan count.
+    /// </summary>
+    /// <param name="bookTitles">The DbSet of BookTitle entities</param>
+    /// <param name="topCount">Number of top books to return</param>
+    /// <param name="daysBack">Number of days to look back for loans</param>
+    /// <returns>An IQueryable of popular BookTitle entities ordered by loan count</returns>
+    public static IQueryable<BookTitle> GetPopularTitles(
+        this DbSet<BookTitle> bookTitles,
+        int topCount = 10,
+        int daysBack = 30)
+    {
+        var startDate = DateTime.UtcNow.AddDays(-daysBack);
+
+        return bookTitles
+            .Select(bt => new
+            {
+                BookTitle = bt,
+                LoanCount = bt.Books.SelectMany(b => b.Loans)
+                    .Count(l => l.BorrowedAt >= startDate)
+            })
+            .OrderByDescending(x => x.LoanCount)
+            .Take(topCount)
+            .Select(x => x.BookTitle);
     }
 
     /// <summary>

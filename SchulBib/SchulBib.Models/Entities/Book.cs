@@ -3,52 +3,48 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SchulBib.Models.Entities;
 
+/// <summary>
+/// Repräsentiert ein physisches Buchexemplar in der Bibliothek.
+/// Jedes Exemplar hat einen eigenen QR-Code und kann individuell ausgeliehen werden.
+/// </summary>
 public class Book : BaseEntity
 {
-    [Required, MaxLength(500)]
-    public string Title { get; set; } = string.Empty;
-
-    [MaxLength(13)] // ISBN-13 or ISBN-10
-    public string? ISBN { get; set; }
-
-    [MaxLength(1000)]
-    public string? Author { get; set; }
-
-    [MaxLength(200)]
-    public string? Publisher { get; set; }
-
-    public int? PublicationYear { get; set; }
-
-    [MaxLength(50)]
-    public string? Language { get; set; } = "de"; // Default Deutsch
+    [Required]
+    public Guid BookTitleId { get; set; }
 
     [Required, MaxLength(200)]
     public string QrCode { get; set; } = string.Empty;
 
-    [MaxLength(500)]
-    public string? CoverImagePath { get; set; } // Lokaler Pfad zum Cover
-
-    [MaxLength(2000)]
-    public string? Description { get; set; }
-
     public BookStatus Status { get; set; } = BookStatus.Available;
 
-    public BookCondition Condition { get; set; } = BookCondition.Good; // Zustand des Buches
+    public BookCondition Condition { get; set; } = BookCondition.Good;
 
     [MaxLength(50)]
     public string? Location { get; set; } // Regal/Standort in der Bibliothek
 
-    // ISBN-Lookup Metadaten als JSON
-    [MaxLength(4000)]
-    public string? ExternalMetadata { get; set; } // JSON für Open Library Data
+    [MaxLength(50)]
+    public string? InventoryNumber { get; set; } // Inventarnummer
 
-    public DateTime? LastISBNLookup { get; set; }
+    public DateTime? AcquisitionDate { get; set; } // Anschaffungsdatum
+
+    public decimal? PurchasePrice { get; set; } // Anschaffungspreis
+
+    [MaxLength(500)]
+    public string? Notes { get; set; } // Notizen zum Exemplar
 
     // Navigation Properties
+    public virtual BookTitle BookTitle { get; set; } = null!;
     public virtual ICollection<Loan> Loans { get; set; } = new List<Loan>();
     public virtual ICollection<BookReservation> Reservations { get; set; } = new List<BookReservation>();
 
     // Computed Properties
     public bool IsAvailable => Status == BookStatus.Available;
-    public bool HasISBN => !string.IsNullOrEmpty(ISBN);
+    public string DisplayName => BookTitle != null ? $"{BookTitle.Title} (#{InventoryNumber ?? QrCode})" : QrCode;
+
+    // Helper Properties für einfacheren Zugriff (delegiert an BookTitle)
+    public string Title => BookTitle?.Title ?? string.Empty;
+    public string? Author => BookTitle?.Author;
+    public string? ISBN => BookTitle?.ISBN;
+    public string? Publisher => BookTitle?.Publisher;
+    public int? PublicationYear => BookTitle?.PublicationYear;
 }

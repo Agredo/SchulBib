@@ -33,6 +33,12 @@ public class SchulBibDbContext : DbContext
     public DbSet<Teacher> Teachers { get; set; }
 
     /// <summary>
+    /// Gets or sets the BookTitles entity collection.
+    /// Provides access to book title records (general book information) in the database.
+    /// </summary>
+    public DbSet<BookTitle> BookTitles { get; set; }
+
+    /// <summary>
     /// Gets or sets the Books entity collection.
     /// Provides access to book records in the database.
     /// </summary>

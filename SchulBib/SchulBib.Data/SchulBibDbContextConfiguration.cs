@@ -11,6 +11,7 @@ public static class SchulBibDbContextConfiguration
         ConfigureBaseEntityBehavior(modelBuilder);
         ConfigureStudentEntity(modelBuilder);
         ConfigureTeacherEntity(modelBuilder);
+        ConfigureBookTitleEntity(modelBuilder);
         ConfigureBookEntity(modelBuilder);
         ConfigureLoanEntity(modelBuilder);
         ConfigureBookReservationEntity(modelBuilder);
@@ -105,47 +106,86 @@ public static class SchulBibDbContextConfiguration
         });
     }
 
+    private static void ConfigureBookTitleEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BookTitle>(entity =>
+        {
+            entity.ToTable("BookTitles");
+
+            // Index für ISBN-Suche (unique, da ISBN eindeutig sein sollte)
+            entity.HasIndex(bt => bt.ISBN)
+                .IsUnique()
+                .HasDatabaseName("UX_BookTitles_ISBN")
+                .HasFilter("[ISBN] IS NOT NULL");
+
+            // Index für Titelsuche
+            entity.HasIndex(bt => bt.Title)
+                .HasDatabaseName("IX_BookTitles_Title");
+
+            // Index für Autorsuche
+            entity.HasIndex(bt => bt.Author)
+                .HasDatabaseName("IX_BookTitles_Author")
+                .HasFilter("[Author] IS NOT NULL");
+
+            // Index für Genre
+            entity.HasIndex(bt => bt.Genre)
+                .HasDatabaseName("IX_BookTitles_Genre")
+                .HasFilter("[Genre] IS NOT NULL");
+
+            // Index für Fachgebiet
+            entity.HasIndex(bt => bt.Subject)
+                .HasDatabaseName("IX_BookTitles_Subject")
+                .HasFilter("[Subject] IS NOT NULL");
+
+            // JSON-Spalte für externe Metadaten
+            entity.Property(bt => bt.ExternalMetadata)
+                .HasColumnType("nvarchar(max)");
+
+            // Check Constraint für Publikationsjahr
+            entity.HasCheckConstraint("CK_BookTitles_PublicationYear",
+                "[PublicationYear] IS NULL OR ([PublicationYear] >= 1450 AND [PublicationYear] <= YEAR(GETDATE()) + 1)");
+        });
+    }
+
+    // Update der ConfigureBookEntity Methode:
     private static void ConfigureBookEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Book>(entity =>
         {
             entity.ToTable("Books");
 
+            // Foreign Key zu BookTitle
+            entity.HasIndex(b => b.BookTitleId)
+                .HasDatabaseName("IX_Books_BookTitleId");
+
             // Unique Constraint für QR-Code
             entity.HasIndex(b => b.QrCode)
                 .IsUnique()
                 .HasDatabaseName("UX_Books_QrCode");
 
-            // Index für ISBN-Suche (nicht unique, da ISBN optional)
-            entity.HasIndex(b => b.ISBN)
-                .HasDatabaseName("IX_Books_ISBN")
-                .HasFilter("[ISBN] IS NOT NULL");
-
-            // Index für Titelsuche
-            entity.HasIndex(b => b.Title)
-                .HasDatabaseName("IX_Books_Title");
-
-            // Index für Autorsuche
-            entity.HasIndex(b => b.Author)
-                .HasDatabaseName("IX_Books_Author")
-                .HasFilter("[Author] IS NOT NULL");
-
             // Index für Statusabfragen
             entity.HasIndex(b => b.Status)
                 .HasDatabaseName("IX_Books_Status");
 
-            // Kombinierter Index für verfügbare Bücher
-            entity.HasIndex(b => new { b.Status, b.Location })
-                .HasDatabaseName("IX_Books_Status_Location")
+            // Kombinierter Index für verfügbare Bücher eines Titels
+            entity.HasIndex(b => new { b.BookTitleId, b.Status })
+                .HasDatabaseName("IX_Books_BookTitleId_Status")
                 .HasFilter("[Status] = 0"); // 0 = Available
 
-            // JSON-Spalte für externe Metadaten
-            entity.Property(b => b.ExternalMetadata)
-                .HasColumnType("nvarchar(max)");
+            // Index für Standort
+            entity.HasIndex(b => b.Location)
+                .HasDatabaseName("IX_Books_Location")
+                .HasFilter("[Location] IS NOT NULL");
 
-            // Check Constraint für Publikationsjahr
-            entity.HasCheckConstraint("CK_Books_PublicationYear",
-                "[PublicationYear] IS NULL OR ([PublicationYear] >= 1450 AND [PublicationYear] <= YEAR(GETDATE()) + 1)");
+            // Unique Constraint für Inventarnummer (falls verwendet)
+            entity.HasIndex(b => b.InventoryNumber)
+                .IsUnique()
+                .HasDatabaseName("UX_Books_InventoryNumber")
+                .HasFilter("[InventoryNumber] IS NOT NULL");
+
+            // Decimal Precision für Preis
+            entity.Property(b => b.PurchasePrice)
+                .HasPrecision(10, 2);
         });
     }
 
@@ -296,6 +336,27 @@ public static class SchulBibDbContextConfiguration
             .WithOne(a => a.Teacher)
             .HasForeignKey(a => a.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // BookTitle -> Books
+        modelBuilder.Entity<BookTitle>()
+            .HasMany(bt => bt.Books)
+            .WithOne(b => b.BookTitle)
+            .HasForeignKey(b => b.BookTitleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Book -> Loans (bestehend)
+        modelBuilder.Entity<Book>()
+            .HasMany(b => b.Loans)
+            .WithOne(l => l.Book)
+            .HasForeignKey(l => l.BookId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Book -> BookReservations (bestehend)
+        modelBuilder.Entity<Book>()
+            .HasMany(b => b.Reservations)
+            .WithOne(r => r.Book)
+            .HasForeignKey(r => r.BookId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ApplyGlobalQueryFilters(ModelBuilder modelBuilder)
@@ -306,6 +367,9 @@ public static class SchulBibDbContextConfiguration
 
         modelBuilder.Entity<Teacher>()
             .HasQueryFilter(t => !t.IsDeleted);
+
+        modelBuilder.Entity<BookTitle>()
+            .HasQueryFilter(bt => !bt.IsDeleted);
 
         modelBuilder.Entity<Book>()
             .HasQueryFilter(b => !b.IsDeleted);
