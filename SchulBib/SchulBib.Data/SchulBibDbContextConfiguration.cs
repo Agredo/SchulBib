@@ -13,24 +13,17 @@ public static class SchulBibDbContextConfiguration
 
         ConfigureIndices(modelBuilder);
         ConfigureCheckConstraints(modelBuilder);
-        CofigurePrecisions(modelBuilder);
+        ConfigurePrecisions(modelBuilder);
 
     }
 
-    private static void CofigurePrecisions(ModelBuilder modelBuilder)
+    private static void ConfigurePrecisions(ModelBuilder modelBuilder)
     {
         // BookTitle precisions
         modelBuilder.Entity<Book>(entity =>
         {
             entity.Property(b => b.PurchasePrice)
                 .HasPrecision(10, 2);
-        });
-
-        // AuditLog precisions
-        modelBuilder.Entity<AuditLog>(entity =>
-        {
-            entity.Property(a => a.Details)
-                .HasColumnType("nvarchar(max)");
         });
     }
 
