@@ -405,4 +405,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 *.db
-/SchulBib/.idea/.idea.SchulBib/.idea
+*.idea

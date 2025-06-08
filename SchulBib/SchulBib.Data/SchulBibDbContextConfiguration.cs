@@ -104,8 +104,6 @@ public static class SchulBibDbContextConfiguration
             entity.HasIndex(l => l.ReturnedAt)
                 .HasDatabaseName("IX_Loans_ReturnedAt")
                 .HasFilter("[ReturnedAt] IS NOT NULL");
-            entity.Property(l => l.IsOverdue)
-                .HasComputedColumnSql("CASE WHEN [DueDate] < GETDATE() AND [Status] = 0 THEN 1 ELSE 0 END");
         });
 
         // BookReservation indices
