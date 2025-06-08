@@ -82,9 +82,6 @@ public static class SchulBibDbContextConfiguration
                 .HasDatabaseName("UX_Books_QrCode");
             entity.HasIndex(b => b.Status)
                 .HasDatabaseName("IX_Books_Status");
-            entity.HasIndex(b => new { b.BookTitleId, b.Status })
-                .HasDatabaseName("IX_Books_BookTitleId_Status")
-                .HasFilter("[Status] = 0");
             entity.HasIndex(b => b.Location)
                 .HasDatabaseName("IX_Books_Location")
                 .HasFilter("[Location] IS NOT NULL");
