@@ -9,17 +9,18 @@ public static class SchulBibDbContextConfiguration
     public static void ApplyAllConfigurations(this ModelBuilder modelBuilder)
     {
         ConfigureBaseEntityBehavior(modelBuilder);
-        ApplyGlobalQueryFilters(modelBuilder);
 
         ConfigureIndices(modelBuilder);
         ConfigureCheckConstraints(modelBuilder);
         ConfigurePrecisions(modelBuilder);
 
+        ApplyGlobalQueryFilters(modelBuilder);
+
     }
 
     private static void ConfigurePrecisions(ModelBuilder modelBuilder)
     {
-        // BookTitle precisions
+        // Book precisions
         modelBuilder.Entity<Book>(entity =>
         {
             entity.Property(b => b.PurchasePrice)
