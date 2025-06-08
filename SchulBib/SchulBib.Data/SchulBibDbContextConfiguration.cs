@@ -166,7 +166,7 @@ public static class SchulBibDbContextConfiguration
                     .ValueGeneratedOnAdd()
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 modelBuilder.Entity(entityType.ClrType)
-                    .HasIndex("IsDeleted")
+                    .HasIndex(nameof(BaseEntity.IsDeleted))
                     .HasDatabaseName($"IX_{entityType.GetTableName()}_IsDeleted");
             }
         }
