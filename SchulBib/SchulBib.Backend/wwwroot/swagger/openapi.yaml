@@ -1,0 +1,69 @@
+﻿openapi: 3.0.1
+info:
+  title: SchulBib API
+  version: v1
+  description: API für die datenschutzkonforme Bibliotheksverwaltung für Schulen
+  contact:
+    name: SchulBib Community
+    email: info@schulbib.de
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+paths:
+  /todos:
+    get:
+      tags:
+        - Todos
+      summary: Liste aller Todos abrufen
+      operationId: GetAllTodos
+      responses:
+        '200':
+          description: Erfolgreich
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+  /todos/{id}:
+    get:
+      tags:
+        - Todos
+      summary: Ein einzelnes Todo nach ID abrufen
+      operationId: GetTodoById
+      parameters:
+        - name: id
+          in: path
+          description: ID des gesuchten Todos
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Todo gefunden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo nicht gefunden
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+          nullable: true
+        dueBy:
+          type: string
+          format: date
+          nullable: true
+        isComplete:
+          type: boolean
+      required:
+        - id
