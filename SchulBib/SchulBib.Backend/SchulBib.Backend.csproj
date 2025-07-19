@@ -8,10 +8,18 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <PublishAot>true</PublishAot>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+	    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+	  </PropertyGroup>
+
+	  <ItemGroup>
+	    <None Update="wwwroot\**\*">
+	      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    </None>
+	  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
